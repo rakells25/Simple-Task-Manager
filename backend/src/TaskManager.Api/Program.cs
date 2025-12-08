@@ -3,58 +3,44 @@ using TaskManager.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers()
-    .ConfigureApiBehaviorOptions(options =>
-    {
-        // mantiene respuesta por defecto de ModelState (400)
-        options.SuppressModelStateInvalidFilter = false;
-    });
+// Agrega soporte para controladores
+builder.Services.AddControllers();
 
+// Swagger para probar la API
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configurar EF Core - SQLite
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                       "Data Source=taskmanager.db";
+// Base de datos SQLite
 builder.Services.AddDbContext<TaskContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseSqlite("Data Source=tasks.db"));
 
-// Configurar CORS para Angular (puedes ajustar origen)
-var allowedOrigin = "AngularDev";
+// CORS para permitir llamadas desde Angular
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: allowedOrigin,
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:4200")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AngularApp",
+        policy => policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
 });
 
 var app = builder.Build();
 
-// Aplicar migraciones automáticamente (opcional)
+// Aplica migraciones automáticamente
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TaskContext>();
-    db.Database.Migrate(); // aplica migraciones si las hay
+    db.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline.
+// Pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("AngularDev");
-
+app.UseCors("AngularApp");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
