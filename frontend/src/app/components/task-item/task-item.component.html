@@ -1,0 +1,46 @@
+<li class="border {{styles.border}} rounded p-4 shadow-sm cursor-pointer {{styles.bg}} {{styles.hover}}" (click)="toggleExpanded()">
+  <div class="flex justify-between items-start">
+    <p class="font-semibold" [class.line-through]="task.status==='done'" [class.text-gray-400]="task.status==='done'">
+      {{ task.title }}
+    </p>
+    <div class="flex flex-col">
+      <p *ngIf="task.dueDate" class="text-sm italic {{styles.text}}">Fecha Fin: {{ task.dueDate | date }}</p>
+      <p class="text-sm font-semibold italic {{styles.text}}">Prioridad: {{ task.priority }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="expanded" class="mt-2 space-y-2 text-left">
+    <p class="text-sm text-gray-700 break-words">{{ task.description }}</p>
+
+    <div class="flex flex-col mt-6 text-sm text-gray-500 italic">
+      <p *ngIf="task.createdAt">Fecha Creación: {{ task.createdAt | date }}</p>
+    </div>
+
+    <div class="flex justify-between text-sm text-gray-700">
+      <p class="italic">Estado: {{ task.status }}</p>
+    </div>
+
+    <div class="flex flex-wrap justify-between items-center">
+      <label class="flex items-center gap-1 text-gray-700">
+        <input type="checkbox" [checked]="task.status==='done'" (click)="onToggle($event)" class="w-4 h-4 rounded">
+        <span class="text-sm select-none">Completada</span>
+      </label>
+
+      <div>
+        <button (click)="onEdit($event)"
+          class="w-24 px-1 mr-2 font-semibold text-teal-600 rounded border-3 border-teal-600 hover:text-white hover:bg-teal-600">
+          Editar
+        </button>
+
+        <button *ngIf="!confirmDelete" (click)="onConfirmDelete($event)"
+          class="w-24 px-1 font-semibold text-red-600 rounded border-3 border-red-600 hover:text-white hover:bg-red-600">
+          Eliminar
+        </button>
+        <button *ngIf="confirmDelete" (click)="onDelete($event)"
+          class="w-24 px-1 font-semibold text-red-600 rounded border-3 border-red-600 hover:text-white hover:bg-red-600">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+</li>

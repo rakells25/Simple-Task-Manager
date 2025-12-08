@@ -1,0 +1,46 @@
+<div class="fixed inset-0 flex justify-center items-center z-50">
+  <div class="absolute inset-0 bg-black/70" (click)="close.emit()"></div>
+
+  <form class="relative bg-white p-6 rounded w-96 shadow-xl z-10" (ngSubmit)="handleSubmit()">
+    <h2 class="italic text-xl text-teal-700 font-semibold mb-8">
+      {{ task ? 'Editar' : 'Nueva' }} Tarea
+    </h2>
+
+    <input type="text" placeholder="Título" [(ngModel)]="form.title" name="title"
+      class="border border-teal-700 rounded p-2 w-full mb-2 focus:outline-none focus:ring-1 focus:ring-teal-700"
+      required minlength="3">
+
+    <textarea placeholder="Descripción" [(ngModel)]="form.description" name="description"
+      class="border border-teal-700 rounded p-2 w-full mb-2 focus:outline-none focus:ring-1 focus:ring-teal-700"></textarea>
+
+    <input type="date" [(ngModel)]="form.dueDate" name="dueDate"
+      class="border border-teal-700 rounded p-2 w-full mb-2 focus:outline-none focus:ring-1 focus:ring-teal-700">
+
+    <label class="block text-left text-teal-700 text-sm">Estado</label>
+    <select [(ngModel)]="form.status" name="status"
+      class="border border-teal-700 rounded p-2 w-full mb-2 focus:outline-none focus:ring-1 focus:ring-teal-700">
+      <option value="toDo">Pendiente</option>
+      <option value="inProgress">En progreso</option>
+      <option value="done">Completada</option>
+    </select>
+
+    <label class="block text-left text-teal-700 text-sm">Prioridad</label>
+    <select [(ngModel)]="form.priority" name="priority"
+      class="border border-teal-700 rounded p-2 w-full mb-4 focus:outline-none focus:ring-1 focus:ring-teal-700">
+      <option value="low">Baja</option>
+      <option value="medium">Media</option>
+      <option value="high">Alta</option>
+    </select>
+
+    <div class="flex justify-end mt-10 gap-2">
+      <button type="button" (click)="close.emit()"
+        class="w-24 py-1 bg-gray-300 font-medium text-teal-700 rounded border-3 border-transparent hover:bg-white hover:text-teal-600 hover:border-teal-600 transition">
+        Cancelar
+      </button>
+      <button type="submit"
+        class="w-24 py-1 bg-teal-600 font-medium text-white rounded border-3 border-transparent hover:bg-white hover:text-teal-600 hover:border-teal-600 transition">
+        Guardar
+      </button>
+    </div>
+  </form>
+</div>
