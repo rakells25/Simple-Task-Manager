@@ -14,17 +14,19 @@ export class TaskFormComponent {
   @Output() save = new EventEmitter<Partial<Task> & { id?: number }>();
   @Output() close = new EventEmitter<void>();
 
+  // Estado local del formulario
   form = {
     title: '',
     description: '',
     status: 'toDo' as TaskStatus,
     priority: 'medium' as TaskPriority,
-    dueDate: null as string | null
+    dueDate: null as string | null,
   };
 
-  saving = false;   // Cuando se está enviando
-  saved = false;    // Cuando se ha guardado
+  saving = false;
+  saved = false;
 
+  // Inicializar formulario si se recibe una tarea para editar
   ngOnInit() {
     if (this.task) {
       this.form = {
@@ -32,29 +34,31 @@ export class TaskFormComponent {
         description: this.task.description ?? '',
         status: this.task.status,
         priority: this.task.priority,
-        dueDate: this.task.dueDate ?? null
+        dueDate: this.task.dueDate ?? null,
       };
     }
   }
 
+  // Maneja el envío del formulario
   handleSubmit() {
-    if (!this.form.title.trim()) return;
+    if (!this.form.title.trim()) return; // Validación mínima: título no vacío
     this.saving = true;
 
+    // Emitir evento para guardar tarea
     this.save.emit({
       id: this.task?.id,
       ...this.form,
-      dueDate: this.form.dueDate || undefined
+      dueDate: this.form.dueDate || undefined,
     });
 
-    // Mostrar check y bloquear botón
+    // Mostrar check de guardado
     this.saved = true;
     this.saving = false;
 
     // Cerrar modal tras 1 segundo
     setTimeout(() => {
       this.close.emit();
-      this.saved = false; // Reset para la próxima vez que abra el modal
+      this.saved = false;
     }, 1000);
   }
 }

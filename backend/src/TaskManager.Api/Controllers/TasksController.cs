@@ -11,11 +11,13 @@ namespace TaskManager.Api.Controllers
     {
         private readonly TaskContext _context;
 
+        // Inyección del contexto de base de datos
         public TasksController(TaskContext context)
         {
             _context = context;
         }
 
+        // Mapea una entidad de base de datos a un DTO que se devuelve al cliente
         private static TaskDto Map(TaskEntity t)
         {
             return new TaskDto
@@ -30,6 +32,8 @@ namespace TaskManager.Api.Controllers
             };
         }
 
+        // GET
+        // Devuelve todas las tareas almacenadas
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasks()
         {
@@ -37,11 +41,14 @@ namespace TaskManager.Api.Controllers
             return tasks.Select(Map).ToList();
         }
 
+        // POST
+        // Crea una nueva tarea y la guarda en la base de datos
         [HttpPost]
         public async Task<ActionResult<TaskDto>> CreateTask(TaskEntity task)
         {
             task.CreatedAt = DateTime.UtcNow;
 
+            // Si no se especifica estado, se asigna "toDo" por defecto
             if (task.Status == null)
                 task.Status = "toDo";
 
@@ -51,6 +58,8 @@ namespace TaskManager.Api.Controllers
             return Ok(Map(task));
         }
 
+        // PUT
+        // Actualiza una tarea existente
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTask(int id, TaskEntity updated)
         {
@@ -68,6 +77,8 @@ namespace TaskManager.Api.Controllers
             return Ok(Map(task));
         }
 
+        // DELETE
+        // Elimina una tarea por ID
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTask(int id)
         {
@@ -80,7 +91,8 @@ namespace TaskManager.Api.Controllers
             return NoContent();
         }
 
-        // NEW /toggle
+        // PATCH
+        // Alterna el estado entre "done" y "toDo"
         [HttpPatch("{id}/toggle")]
         public async Task<ActionResult<TaskDto>> ToggleTask(int id)
         {
