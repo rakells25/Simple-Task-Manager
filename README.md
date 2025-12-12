@@ -56,10 +56,14 @@ Aplicación web para gestionar tareas con **.NET 7 + Entity Framework Core** en 
 
 ### Backend
 
-1. Clonar el repositorio y entrar en el proyecto backend:
+1. Clonar el repositorio y entrar en el proyecto:
 
 ```bash
-git clone <url-del-repo>
 cd TaskManager.Api
 dotnet restore
 dotnet run
+
+### Frontend
+cd frotend
+npm install
+ng serve
