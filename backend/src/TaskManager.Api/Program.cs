@@ -19,10 +19,12 @@ builder.Services.AddDbContext<TaskContext>(options =>
 // Configura CORS para permitir llamadas desde Angular
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AngularApp",
-        policy => policy.WithOrigins("http://localhost:4200") // Angular dev server
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
+    options.AddPolicy("AngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();

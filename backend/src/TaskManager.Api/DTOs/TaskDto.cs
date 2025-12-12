@@ -1,23 +1,13 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace TaskManager.Api.Models
 {
-    public class TaskEntity
+    public class TaskDto
     {
         public int Id { get; set; }
-
-        [Required]
-        public string Title { get; set; } = string.Empty;
-
+        public string Title { get; set; } = "";
         public string? Description { get; set; }
-
         public string? Status { get; set; }
-
-        [Required]
         public string Priority { get; set; } = "medium";
-
-        public DateTime? DueDate { get; set; }
-
         public DateTime CreatedAt { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

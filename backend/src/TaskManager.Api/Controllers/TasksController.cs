@@ -16,61 +16,60 @@ namespace TaskManager.Api.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll()
+        private static TaskDto Map(TaskEntity t)
         {
-            var tasks = await _context.Tasks
-                .OrderByDescending(t => t.CreatedAt)
-                .ToListAsync();
-
-            return tasks;
+            return new TaskDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Description = t.Description,
+                Status = t.Status,
+                Priority = t.Priority,
+                CreatedAt = t.CreatedAt,
+                DueDate = t.DueDate
+            };
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TaskItem>> Get(int id)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasks()
         {
-            var task = await _context.Tasks.FindAsync(id);
-            if (task == null) return NotFound();
-            return task;
+            var tasks = await _context.Tasks.ToListAsync();
+            return tasks.Select(Map).ToList();
         }
 
         [HttpPost]
-        public async Task<ActionResult<TaskItem>> Create(TaskItem task)
+        public async Task<ActionResult<TaskDto>> CreateTask(TaskEntity task)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            task.CreatedAt = DateTime.UtcNow;
 
-            task.CreatedAt = DateTime.UtcNow; // <-- Asegura que CreatedAt no sea null
+            if (task.Status == null)
+                task.Status = "toDo";
+
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(Get), new { id = task.Id }, task);
+            return Ok(Map(task));
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, TaskItem task)
-        {
-            if (id != task.Id) return BadRequest();
-
-            _context.Entry(task).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        [HttpPatch("{id}/toggle")]
-        public async Task<IActionResult> Toggle(int id)
+        public async Task<IActionResult> UpdateTask(int id, TaskEntity updated)
         {
             var task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
 
-            task.IsCompleted = !task.IsCompleted;
+            task.Title = updated.Title;
+            task.Description = updated.Description;
+            task.Status = updated.Status;
+            task.Priority = updated.Priority;
+            task.DueDate = updated.DueDate;
+
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(Map(task));
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteTask(int id)
         {
             var task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
@@ -79,6 +78,20 @@ namespace TaskManager.Api.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // NEW /toggle
+        [HttpPatch("{id}/toggle")]
+        public async Task<ActionResult<TaskDto>> ToggleTask(int id)
+        {
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null) return NotFound();
+
+            task.Status = task.Status == "done" ? "toDo" : "done";
+
+            await _context.SaveChangesAsync();
+
+            return Ok(Map(task));
         }
     }
 }

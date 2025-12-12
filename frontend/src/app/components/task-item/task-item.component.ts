@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Task } from '../../models/task.model';
+import { Task, TaskPriority } from '../../models/task.model';
 
 @Component({
   selector: 'app-task-item',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './task-item.component.html',
-  styleUrls: ['./task-item.component.css']
 })
 export class TaskItemComponent {
   @Input() task!: Task;
@@ -43,10 +42,11 @@ export class TaskItemComponent {
   }
 
   onDelete(event: Event) {
-    event.stopPropagation();
-    this.delete.emit(this.task.id);
-  }
+  event.stopPropagation();
+  this.delete.emit(this.task.id!);
+}
 
+  // ✅ Getter para estilos según prioridad
   get styles() {
     switch (this.task.priority) {
       case 'high':

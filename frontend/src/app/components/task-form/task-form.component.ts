@@ -8,57 +8,53 @@ import { Task, TaskStatus, TaskPriority } from '../../models/task.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './task-form.component.html',
-  styleUrls: ['./task-form.component.css']
 })
 export class TaskFormComponent {
   @Input() task?: Task;
   @Output() save = new EventEmitter<Partial<Task> & { id?: number }>();
   @Output() close = new EventEmitter<void>();
 
-  form: {
-    title: string;
-    description: string;
-    status: TaskStatus;
-    priority: TaskPriority;
-    dueDate: string;
-  } = {
+  form = {
     title: '',
     description: '',
-    status: 'toDo',
-    priority: 'medium',
-    dueDate: ''
+    status: 'toDo' as TaskStatus,
+    priority: 'medium' as TaskPriority,
+    dueDate: null as string | null
   };
+
+  saving = false;   // Cuando se está enviando
+  saved = false;    // Cuando se ha guardado
 
   ngOnInit() {
     if (this.task) {
       this.form = {
-        title: this.task.title ?? '',
+        title: this.task.title,
         description: this.task.description ?? '',
-        status: this.task.status ?? 'toDo',
-        priority: this.task.priority ?? 'medium',
-        dueDate: this.task.dueDate ?? ''
+        status: this.task.status,
+        priority: this.task.priority,
+        dueDate: this.task.dueDate ?? null
       };
     }
   }
 
   handleSubmit() {
-    if (this.form.dueDate) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const selected = new Date(this.form.dueDate);
-      if (selected < today) {
-        alert('La fecha de vencimiento no puede ser anterior a hoy.');
-        return;
-      }
-    }
+    if (!this.form.title.trim()) return;
+    this.saving = true;
 
     this.save.emit({
       id: this.task?.id,
-      title: this.form.title,
-      description: this.form.description,
-      status: this.form.status,
-      priority: this.form.priority,
+      ...this.form,
       dueDate: this.form.dueDate || undefined
     });
+
+    // Mostrar check y bloquear botón
+    this.saved = true;
+    this.saving = false;
+
+    // Cerrar modal tras 1 segundo
+    setTimeout(() => {
+      this.close.emit();
+      this.saved = false; // Reset para la próxima vez que abra el modal
+    }, 1000);
   }
 }
