@@ -1,0 +1,90 @@
+<div class="px-56 mt-12">
+  <!-- Título principal -->
+  <h1 class="flex justify-center italic pt-4 text-4xl text-teal-700 font-bold mb-12 tracking-wide">
+    Lista de Tareas
+  </h1>
+
+  <!-- FILTROS POR ESTADO -->
+  <div class="flex justify-center font-medium gap-4 mb-24 flex-wrap">
+    <!-- Botones para filtrar tareas por estado -->
+    <button
+      *ngFor="let item of statusOptions"
+      (click)="setStatusFilter(item.value)"
+      [ngClass]="
+        statusFilter === item.value
+          ? 'bg-teal-600 text-white'
+          : 'bg-white text-teal-700 hover:bg-teal-50'
+      "
+      class="py-4 px-6 rounded-lg shadow hover:shadow-lg transition flex flex-col items-center justify-center"
+    >
+      <h2 class="text-lg font-medium">{{ item.label }}</h2>
+      <p class="text-base font-medium mt-1">({{ item.count }})</p>
+    </button>
+  </div>
+
+  <!-- SECCIÓN DE ORDENAR Y FILTRAR POR PRIORIDAD -->
+  <div class="flex flex-wrap justify-between items-center mb-6">
+    <div class="flex gap-4 flex-wrap">
+      <!-- Ordenar por fecha de creación o fecha de vencimiento -->
+      <div class="flex flex-col">
+        <label class="block text-left text-teal-700 text-sm mb-1"> Ordenar por: </label>
+        <select
+          [(ngModel)]="sortBy"
+          (change)="applyFilters()"
+          class="border border-teal-700 text-teal-700 rounded-lg px-3 py-2 shadow-sm"
+        >
+          <option value="createdAt">Fecha de creación</option>
+          <option value="dueDate">Fecha de vencimiento</option>
+        </select>
+      </div>
+
+      <!-- Filtrar por prioridad -->
+      <div class="flex flex-col">
+        <label class="block text-left text-teal-700 text-sm mb-1"> Filtrar por prioridad: </label>
+        <select
+          [(ngModel)]="priorityFilter"
+          (change)="applyFilters()"
+          class="border border-teal-700 text-teal-700 rounded-lg px-3 py-2 shadow-sm"
+        >
+          <option value="all">Todas</option>
+          <option value="high">Alta</option>
+          <option value="medium">Media</option>
+          <option value="low">Baja</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Botón para abrir el modal de añadir tarea -->
+    <button
+      (click)="openModal()"
+      class="mb-4 px-6 py-2 bg-teal-600 text-white rounded-lg shadow hover:bg-teal-50 hover:text-teal-600 transition font-medium"
+    >
+      Añadir Tarea
+    </button>
+  </div>
+
+  <!-- LISTA DE TAREAS -->
+  <div class="max-h-[500px] overflow-y-auto pr-2">
+    <ul class="space-y-3">
+      <!-- Mensaje si no hay tareas filtradas -->
+      <p *ngIf="filteredTasks.length === 0" class="text-center text-gray-500 mt-6">No hay tareas</p>
+
+      <!-- Componente para cada tarea -->
+      <app-task-item
+        *ngFor="let task of filteredTasks"
+        [task]="task"
+        (toggle)="handleToggle($event)"
+        (edit)="openModal($event)"
+        (delete)="handleDelete($event)"
+      ></app-task-item>
+    </ul>
+  </div>
+
+  <!-- MODAL PARA CREAR O EDITAR TAREA -->
+  <app-task-form
+    *ngIf="showModal"
+    [task]="modalTask ?? undefined"
+    (save)="handleSave($event)"
+    (close)="closeModal()"
+  ></app-task-form>
+</div>
